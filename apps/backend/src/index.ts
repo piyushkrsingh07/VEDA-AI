@@ -16,9 +16,9 @@ app.get('/ping',(req:Request,res:Response):Response=>{
     return res.send("Server is Live!")
 })
 
-// const port:number = Number(process.env.PORT) || 5000
+const port:number = Number(process.env.PORT) || 5000
 
-app.listen(4000,()=>{
+app.listen(port,()=>{
     console.log(`server is running at http://localhost:4000`)
 
 })
