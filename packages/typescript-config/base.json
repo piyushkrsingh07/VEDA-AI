@@ -15,6 +15,10 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2022",
-    "types":["node"]
+    "baseUrl": ".",
+    "types":["node"],
+        "paths": {
+      "@repo/db": ["../db/src/index.ts"]
+    }
   }
 }

@@ -4,22 +4,23 @@
     "private": true,
     "scripts": {
         "start": "node dist/index.js",
-        "dev": "tsc-watch --onSuccess \"node dist/index.js\"",
+"dev": "nodemon --watch src --ext ts --exec npx tsx src/index.ts",
         "build": "tsc -p ."
     },
     "devDependencies": {
-        "tsc-watch": "^7.2.0",
-        "typescript": "^5.9.2",
-                "@types/cookie-parser": "^1.4.10",
+        "@types/cookie-parser": "^1.4.10",
         "@types/cors": "^2.8.19",
-        "@types/express": "^5.0.6"
+        "@types/express": "^5.0.6",
+        "nodemon": "^3.1.14",
+        "tsc-watch": "^7.2.0",
+        "typescript": "^5.9.2"
     },
     "dependencies": {
-  
+        "@repo/db": "*",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.6",
         "dotenv": "^16.0.3",
         "express": "^5.2.1"
     },
-      "type": "module"
+    "type": "module"
 }

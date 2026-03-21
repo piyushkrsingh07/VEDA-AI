@@ -1,1 +1,1 @@
-export {connect} from './connection'
+export {connect} from './connection.js'

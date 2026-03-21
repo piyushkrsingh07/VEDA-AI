@@ -4,7 +4,7 @@ import { error } from 'node:console';
 
 let isConnected=false;
 
-export async function connect(){
+export const connect=async()=>{
     if(isConnected){
         return mongoose.connection
     }
@@ -14,19 +14,24 @@ export async function connect(){
     }
     try{
       await mongoose.connect(mongoDbUrl)
-
+      isConnected = true;
+  console.log("MongoDB connected successfully main m");
       const connection=mongoose.connection;
 
-      connection.on('connected',()=>{
-        console.log('Mongodb connected successfully')
+     connection.on('connected',()=>{
+        console.log('Mongodb connected successfully yha s')
       })
 
-      connection.on('error',()=>{
-        console.error("Mongodb connection failed",error)
+      connection.on('error',(err)=>{
+        console.error("Mongodb connection failed yha s",err)
         throw new Error("Unable to connect to mongodb")
-      })
+      }) 
+
+      return mongoose.connection
     }catch(error){
      console.error('Mongodb connection failed',error)
      throw new Error('Unable to connect to mongodb')
     }
 }
+export default connect;
+
