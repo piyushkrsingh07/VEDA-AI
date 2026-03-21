@@ -1,16 +1,51 @@
 import mongoose from 'mongoose'
 
-const generatedPaperSchema=new mongoose.Schema({
+const DIFFICULTY_TYPES=["easy","medium","hard"] as const
+const QUESTION_TYPES = ["MCQ", "SHORT", "DIAGRAM", "NUMERICAL", "LONG"] as const;
+
+interface Question {
+    questionNo:number;
+    text:string;
+    type:(typeof QUESTION_TYPES)[number];
+    difficulty:(typeof DIFFICULTY_TYPES)[number];
+    marks:number;
+
+}
+
+interface Section {
+    title:string;
+    instructions:string;
+    questions:Question[]
+}
+
+interface Metadata {
+  totalQuestions: number;
+  totalMarks: number;
+  generationInMs: number;
+  errorMessage?: string;
+}
+
+interface PaperType {
+    assignmentId:mongoose.Types.ObjectId;
+    prompt:string;
+    sections:Section[];
+    metadata:Metadata
+
+}
+
+const generatedPaperSchema=new mongoose.Schema<PaperType>({
     assignmentId:{
         type:mongoose.SchemaTypes.ObjectId,
-        required:"true",
+        required:true,
         ref:"Assignment"
     },
     prompt:{
       type:String,
       required:true
     },
-    sections:[{
+    sections:{
+    type:[{
+        id:false,
         title:{
             type:String,
             required:true
@@ -18,34 +53,37 @@ const generatedPaperSchema=new mongoose.Schema({
         instructions:{
             type:String,
             required:true,
-             questions:[{
+        },
+        questions:[{
+        _id:false,
         questionNo:{
-            type:mongoose.SchemaTypes.Int32,
+            type:Number,
             required:true
         },
         text:{
             type:String,
-            required:"true"
+            required:true
         },
         type:{
             type:String,
-            required:'true',
+                    enum:{
+            values:QUESTION_TYPES,
+            message:`{VALUE} is not a valid question type`
+        },
+            required:true,
 
         },
         difficulty:{
                   type:String,
         enum:{
-            values:["easy","medium","hard"],
+            values:DIFFICULTY_TYPES,
             message:`{VALUE} is not a valid question difficulty type`
         },
-       validate(value:string){
-            if(!["easy","medium","hard"].includes(value)){
-                throw new Error("Not a valid question type")
-            }
-        }  
+        required:true,
+        default:"easy"
         },
         marks:{
-            type:mongoose.SchemaTypes.Int32,
+            type:Number,
             required:true
         },
         
@@ -54,22 +92,24 @@ const generatedPaperSchema=new mongoose.Schema({
     }
 
     ],
-        }
+        
 
     }
         
     ],
+    default:[]
+},
     metadata:{
      totalQuestions:{
-        type:mongoose.SchemaTypes.Int32,
+        type:Number,
         required:true
      },
     totalMarks:{
-        type:mongoose.SchemaTypes.Int32,
+        type:Number,
         required:true
      },
      generationInMs:{
-        type:mongoose.SchemaTypes.Int32,
+        type:Number,
         required:true
      },
      errorMessage:{
@@ -83,6 +123,6 @@ const generatedPaperSchema=new mongoose.Schema({
     timestamps:true
 })
 
-const generatedPaperModel=mongoose.models?.GeneratedPaper || mongoose.model("GeneratedPaper",generatedPaperSchema)
+const generatedPaperModel=mongoose.models?.GeneratedPaper || mongoose.model<PaperType>("GeneratedPaper",generatedPaperSchema)
 
 export default generatedPaperModel

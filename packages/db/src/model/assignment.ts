@@ -1,31 +1,90 @@
 import mongoose from 'mongoose'
+import { model } from 'mongoose'
 
-const assignmentSchema=new mongoose.Schema({
+const SOURCE_FILE_TYPES=["pdf","txt","none"] as const 
+
+const QUESTION_TYPES=["MCQ","SHORT","DIAGRAM","NUMERICAL","LONG"] as const
+
+const GENERATION_STATUS=["DRAFT","QUEUED","PROCESSING","COMPLETED","FAILED"] as const
+
+interface Question {
+    type:(typeof QUESTION_TYPES)[number];
+    count:number;
+    marksPerQuestion:number;
+
+}
+
+interface Material {
+    fileUrl:string;
+    fileName?:string;
+    fileType:(typeof SOURCE_FILE_TYPES)[number];
+    extractedText?:string
+}
+
+interface AssignmentType {
+    title:string;
+    sourceMaterial:Material[];
+    dueDate:Date;
+
+    questionTypes:Question[];
+    totalQuestions:number;
+    instructions?:string
+    totalMarks:number;
+    generationStatus:(typeof GENERATION_STATUS)[number];
+    currentJobId:string;
+    generatedPaperId:mongoose.Types.ObjectId
+
+
+}
+
+const questionSchema=new mongoose.Schema<Question>({
+        type:{ 
+        type:String,
+        enum:{
+            values:QUESTION_TYPES,
+            message:`{VALUE} is not a valid question type`
+        },
+        required:true
+
+       },
+       count:{ 
+          type:Number,
+          required:true,
+          min:1
+       },
+       marksPerQuestion:{
+         type:Number,
+          required:true,
+          min:1
+       },
+   
+}, {_id:false})
+
+const assignmentSchema=new mongoose.Schema<AssignmentType>({
    title:{
     type:String,
     required:true,
-    index:true
+    index:true,
+    trim:true
    },
-   sourceMaterial:[{
+   sourceMaterial:{
+   type:[{
     fileUrl:{type:String,required:true},
     fileName:{type:String},
-    filetype:{
+    fileType:{
         type:String,
         enum:{
-            values:["pdf","txt","none"],
+            values:SOURCE_FILE_TYPES,
             message:`{VALUE} is not a valid file type`,
-
+      
         },
-        validate(value:string){
-            if(!["pdf","txt","none"].includes(value)){
-                throw new Error("Not a valid file type")
-            }
-        }
+        default:"none"
+
     },
     extractedText:{type:String}
    }
 
-   ],
+   ]},
    dueDate:{
     type:mongoose.SchemaTypes.Date,
     required:true
@@ -34,50 +93,37 @@ const assignmentSchema=new mongoose.Schema({
     type:String,
     
    },
-   questionTypes:[{
-    
-       type:{ 
-        type:String,
-        enum:{
-            values:["MCQ","SHORT","DIAGRAM","NUMERICAL","LONG"],
-            message:`{VALUE} is not a valid question type`
+   questionTypes:{
+    type:[questionSchema],
+    required:true,
+    validate:{
+        validator: function (value: Question[]){
+            return Array.isArray(value) && value?.length >0
         },
-       validate(value:string){
-            if(!["MCQ","SHORT","DIAGRAM","NUMERICAL","LONG"].includes(value)){
-                throw new Error("Not a valid question type")
-            }
-        }
-       },
-       count:{ 
-          type:mongoose.SchemaTypes.Int32,
-          required:true,
+        message:"At least one question type is required"
+    }
 
-       },
-       marksPerQuestion:{
-         type:mongoose.SchemaTypes.Int32,
-          required:true,
-       }
 }
-   ],
+   ,
    totalQuestions:{
-           type:mongoose.SchemaTypes.Int32,
+           type:Number,
           required:true,
+          min:1
    },
    totalMarks:{
-           type:mongoose.SchemaTypes.Int32,
+           type:Number,
           required:true,
+          min:1
    },
    generationStatus:{
      type:String,
      enum:{
-            values:["DRAFT","QUEUED","PROCESSING","COMPLETED","FAILED"],
+            values:GENERATION_STATUS,
             message:`{VALUE} is not a valid status type`
      },
-            validate(value:string){
-            if(!["DRAFT","QUEUED","PROCESSING","COMPLETED","FAILED"].includes(value)){
-                throw new Error("Not a valid status type")
-            }
-        }
+     required:true,
+     default:"DRAFT"
+
     
    },
    currentJobId:{
@@ -97,6 +143,7 @@ const assignmentSchema=new mongoose.Schema({
     timestamps:true
 })
 
-const assignmentModel=mongoose.models?.Assignment || mongoose.model("Assignment",assignmentSchema)
+const assignmentModel=mongoose.models?.Assignment || mongoose.model<AssignmentType>("Assignment",assignmentSchema)
 
 export default assignmentModel
+

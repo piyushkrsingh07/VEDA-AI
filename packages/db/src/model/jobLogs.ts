@@ -1,9 +1,23 @@
 import mongoose from 'mongoose'
 
-const jobLogsSchema=new mongoose.Schema({
+const JOB_TYPE=["GENERATE_ASSIGNMENT","GENERATE_PDF"] as const
+
+const STATUS_TYPE=["QUEUED","ACTIVE","COMPLETED","FAILED"] as const
+
+interface JobLogs {
+    assignmentId:mongoose.Types.ObjectId;
+    jobId:string;
+    jobType:(typeof JOB_TYPE)[number];
+    status:(typeof STATUS_TYPE)[number];
+    attemptsMade:number;
+    errorMessage:mongoose.Types.ObjectId
+}
+
+const jobLogsSchema=new mongoose.Schema<JobLogs>({
     assignmentId:{
-        type:String,
-        ref:"Assignment"
+        type:mongoose.SchemaTypes.ObjectId,
+        ref:"Assignment",
+        required:true
     },
     jobId:{
         type:String,
@@ -12,40 +26,32 @@ const jobLogsSchema=new mongoose.Schema({
     jobType:{
         type:String,
              enum:{
-            values:["GENERATE_ASSIGNMENT","GENERATE_PDF"],
+            values:JOB_TYPE,
             message:`{VALUE} is not a valid status type`
      },
-            validate(value:string){
-            if(!["GENERATE_ASSIGNMENT","GENERATE_PDF"].includes(value)){
-                throw new Error("Not a valid status type")
-            }
-        }
-    
+     required:true
+
 },
 status:{
     type:String,
                  enum:{
-            values:["QUEUED","ACTIVE","COMPLETED","FAILED"],
+            values:STATUS_TYPE,
             message:`{VALUE} is not a valid status type`
      },
-            validate(value:string){
-            if(!["QUEUED","ACTIVE","COMPLETED","FAILED"].includes(value)){
-                throw new Error("Not a valid status type")
-            }
-        },
+
         required:true
 
 },
 attemptsMade:{
-              type:mongoose.SchemaTypes.Int32,
+              type:Number,
               required:true,
 },
 errorMessage:{
-    type:String,
+    type:mongoose.SchemaTypes.ObjectId,
     ref:"GeneratedPaper"
 }
 })
 
-const jobLogsModel=mongoose.models?.Logs || mongoose.model("Logs",jobLogsSchema)
+const jobLogsModel=mongoose.models?.JobLog || mongoose.model<JobLogs>("JobLog",jobLogsSchema)
 
 export default jobLogsModel
