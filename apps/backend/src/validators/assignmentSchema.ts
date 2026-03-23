@@ -30,7 +30,7 @@ export const AssignmentSchema=z.object({
   generationStatus:z.enum(GENERATION_STATUS),
   currentJobId: z.string().min(1, "Current job id is required"),
 
-  generatedPaperId: z.string().min(1, "Generated paper id is required"),
+//   generatedPaperId: z.string().min(1, "Generated paper id is required"),
 
 })
 

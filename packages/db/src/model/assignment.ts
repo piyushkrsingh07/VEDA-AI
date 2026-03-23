@@ -131,11 +131,11 @@ const assignmentSchema=new mongoose.Schema<AssignmentType>({
      required:true
 
    },
-   generatedPaperId:{
-    type:mongoose.SchemaTypes.ObjectId,
-    required:true,
-    ref:"GeneratedPaper"
-   },
+//    generatedPaperId:{
+//     type:mongoose.SchemaTypes.ObjectId,
+//     required:true,
+//     ref:"GeneratedPaper"
+//    },
 
 
    

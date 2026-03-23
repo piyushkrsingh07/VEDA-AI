@@ -20,7 +20,7 @@ cloudinary.config({
   api_secret: apiSecret
 });
 
-export const uploadToCloudinary=async(localFilePath:string)=>{
+export const uploadToCloudinary=async(localFilePath:string[])=>{
     try{
  if(!localFilePath){
                       throw new ClientError ({
@@ -32,14 +32,28 @@ export const uploadToCloudinary=async(localFilePath:string)=>{
    
     }
 
-     const response =await   cloudinary.uploader.upload(localFilePath,{
+
+
+    const uploadedUrl=await Promise.all(localFilePath.map(async(path)=>{
+
+      const response=await cloudinary.uploader.upload(path,{
         resource_type:"auto"
       })
 
-         console.log("file is uploaded on cloudinary",response?.url)
-         return response?.url
+      await  fs.unlinkSync(path)
+
+      return response.url
+    }))
+
+    return uploadedUrl
+
+
+ 
     }catch(error){
-      fs.unlinkSync(localFilePath)
+     
+      await Promise.all(localFilePath.map(async(path)=>{
+        fs.unlinkSync(path)
+      }))
       throw error
     }
 
