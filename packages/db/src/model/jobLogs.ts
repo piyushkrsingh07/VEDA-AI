@@ -10,7 +10,7 @@ interface JobLogs {
     jobType:(typeof JOB_TYPE)[number];
     status:(typeof STATUS_TYPE)[number];
     attemptsMade:number;
-    errorMessage:mongoose.Types.ObjectId
+    errorMessage?:mongoose.Types.ObjectId
 }
 
 const jobLogsSchema=new mongoose.Schema<JobLogs>({

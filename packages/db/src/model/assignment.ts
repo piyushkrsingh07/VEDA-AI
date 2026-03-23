@@ -31,8 +31,8 @@ interface AssignmentType {
     instructions?:string
     totalMarks:number;
     generationStatus:(typeof GENERATION_STATUS)[number];
-    currentJobId:string;
-    generatedPaperId:mongoose.Types.ObjectId
+    currentJobId?:string;
+    generatedPaperId?:mongoose.Types.ObjectId
 
 
 }
@@ -128,14 +128,14 @@ const assignmentSchema=new mongoose.Schema<AssignmentType>({
    },
    currentJobId:{
      type:String,
-     required:true
+     
 
    },
-//    generatedPaperId:{
-//     type:mongoose.SchemaTypes.ObjectId,
-//     required:true,
-//     ref:"GeneratedPaper"
-//    },
+   generatedPaperId:{
+    type:mongoose.SchemaTypes.ObjectId,
+   
+    ref:"GeneratedPaper"
+   },
 
 
    

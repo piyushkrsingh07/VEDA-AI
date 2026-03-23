@@ -24,7 +24,10 @@
     "packages/*"
   ],
   "dependencies": {
+    "bull": "^4.16.5",
+    "bullmq": "^5.71.0",
     "dotenv": "^17.3.1",
+    "ioredis": "^5.10.1",
     "mongoose": "^9.3.1"
   }
 }

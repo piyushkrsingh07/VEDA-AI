@@ -5,12 +5,14 @@ export const validate = async <T>(
     data: T
 ): Promise<T> => {
   try{
+
+    console.log("yha aa ya hai")
   const verify =   await schema.parseAsync(data);
    console.log(verify,'see verify')
   return verify
  
   }catch(error){
-    console.log(error,'dekho error')
+    console.log(error,'dekho error aya hai')
     throw error
   }
 
