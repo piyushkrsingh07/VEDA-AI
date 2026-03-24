@@ -1,9 +1,9 @@
 import mongoose from 'mongoose'
-import { model } from 'mongoose'
+import { Model } from 'mongoose'
 
 const SOURCE_FILE_TYPES=["pdf","txt","none"] as const 
 
-const QUESTION_TYPES=["MCQ","SHORT","DIAGRAM","NUMERICAL","LONG"] as const
+const QUESTION_TYPES=["MCQ","SHORT","VERY_SHORT","DIAGRAM","NUMERICAL","LONG","CASE_STUDY"] as const
 
 const GENERATION_STATUS=["DRAFT","QUEUED","PROCESSING","COMPLETED","FAILED"] as const
 
@@ -17,11 +17,11 @@ interface Question {
 interface Material {
     fileUrl:string;
     fileName?:string;
-    fileType:(typeof SOURCE_FILE_TYPES)[number];
+    fileType?:(typeof SOURCE_FILE_TYPES)[number];
     extractedText?:string
 }
 
-interface AssignmentType {
+export interface AssignmentType {
     title:string;
     sourceMaterial:Material[];
     dueDate:Date;
@@ -143,7 +143,7 @@ const assignmentSchema=new mongoose.Schema<AssignmentType>({
     timestamps:true
 })
 
-const assignmentModel=mongoose.models?.Assignment || mongoose.model<AssignmentType>("Assignment",assignmentSchema)
+const assignmentModel: Model<AssignmentType>=mongoose.models?.Assignment || mongoose.model<AssignmentType>("Assignment",assignmentSchema)
 
 export default assignmentModel
 

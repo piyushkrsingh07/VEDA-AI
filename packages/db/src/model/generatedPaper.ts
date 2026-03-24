@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 const DIFFICULTY_TYPES=["easy","medium","hard"] as const
-const QUESTION_TYPES = ["MCQ", "SHORT", "DIAGRAM", "NUMERICAL", "LONG"] as const;
+const QUESTION_TYPES = ["MCQ","SHORT","VERY_SHORT","DIAGRAM","NUMERICAL","LONG","CASE_STUDY"] as const;
 
 interface Question {
     questionNo:number;

@@ -7,7 +7,7 @@ export const validate = async <T>(
   try{
 
     console.log("yha aa ya hai")
-  const verify =   await schema.parseAsync(data);
+  const verify = await schema.parseAsync(data);
    console.log(verify,'see verify')
   return verify
  

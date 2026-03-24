@@ -15,7 +15,7 @@ export interface Question {
 export interface Material {
     fileUrl:string;
     fileName?:string;
-    fileType:(typeof SOURCE_FILE_TYPES)[number];
+    fileType?:(typeof SOURCE_FILE_TYPES)[number];
     extractedText?:string
 }
 
@@ -25,12 +25,10 @@ export interface AssignmentType {
     dueDate:Date;
 
     questionTypes:Question[];
-    totalQuestions:number;
+  
     instructions?:string
-    totalMarks:number;
-    generationStatus:(typeof GENERATION_STATUS)[number];
-    currentJobId?:string;
-
+   
+ 
 
 
 }
