@@ -24,9 +24,9 @@ const postAssignment=async(req:Request,res:Response)=>{
         })
       }
 
-      const localFilePath=files?.map((file)=>file?.path) ?? []
 
-      const cloudinaryUpload=await uploadToCloudinary(localFilePath)
+
+      const cloudinaryUpload=await uploadToCloudinary(files)
 
       console.log(cloudinaryUpload,'see uploaded files')
 

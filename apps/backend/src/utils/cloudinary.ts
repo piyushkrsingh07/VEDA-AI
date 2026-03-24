@@ -1,70 +1,65 @@
-import {v2 as cloudinary} from 'cloudinary'
-import fs from 'fs'
-import { customErrorResponse } from './responseObject.js';
-import { response } from 'express';
-import ClientError from '../errors/clientError.js';
-import { StatusCodes } from 'http-status-codes';
+import { v2 as cloudinary } from "cloudinary";
+import ClientError from "../errors/clientError.js";
+import { StatusCodes } from "http-status-codes";
+import streamifier from "streamifier";
 
 const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 const apiKey = process.env.CLOUDINARY_API_KEY;
 const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
-
 if (!cloudName || !apiKey || !apiSecret) {
   throw new Error("Missing Cloudinary Configuration");
 }
 
-cloudinary.config({ 
-  cloud_name: cloudName, 
-  api_key: apiKey, 
-  api_secret: apiSecret
+cloudinary.config({
+  cloud_name: cloudName,
+  api_key: apiKey,
+  api_secret: apiSecret,
 });
 
-export const uploadToCloudinary=async(localFilePath:string[])=>{
-    try{
- if(!localFilePath){
-                      throw new ClientError ({
-        explanation:'Invalid data sent from the client',
-        message:'No registered user found for this email',
-        statusCode:StatusCodes.NOT_FOUND
-       })
-
-   
+export const uploadToCloudinary = async (files: Express.Multer.File[]) => {
+  try {
+    if (!files || files.length === 0) {
+      throw new ClientError({
+        explanation: "Invalid data sent from the client",
+        message: "No files provided",
+        statusCode: StatusCodes.NOT_FOUND,
+      });
     }
 
+    const uploadedUrl = await Promise.all(
+      files.map(
+        (file) =>
+          new Promise<{
+            fileUrl: string;
+            fileName: string;
+            fileType: string;
+          }>((resolve, reject) => {
+            const upload = cloudinary.uploader.upload_stream(
+              {
+                resource_type: "auto",
 
+              },
+              (error, result) => {
+                if (error || !result) {
+                  return reject(error ?? new Error("Upload failed"));
+                }
 
-    const uploadedUrl=await Promise.all(localFilePath.map(async(path)=>{
+                resolve({
+                  fileUrl: result.secure_url,
+                  fileName: result.original_filename || file.originalname,
+                  fileType: result.format || file.mimetype,
+                });
+              }
+            );
 
-      const response=await cloudinary.uploader.upload(path,{
-        resource_type:"auto"
-      })
-      console.log(response,'see cloudinary response')
+            streamifier.createReadStream(file.buffer).pipe(upload);
+          })
+      )
+    );
 
-      await  fs.unlinkSync(path)
-
-      return {
-        fileUrl:response?.secure_url,
-        fileName:response?.original_filename,
-        fileType:response?.format
-      }
-    }))
-
-    return uploadedUrl
-
-
- 
-    }catch(error){
-     
-      await Promise.all(localFilePath.map(async(path)=>{
-        fs.unlinkSync(path)
-      }))
-      throw error
-    }
-
-    
-   
-
-   
-
-}
+    return uploadedUrl;
+  } catch (error) {
+    throw error;
+  }
+};
